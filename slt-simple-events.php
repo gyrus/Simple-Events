@@ -9,7 +9,7 @@ Plugin Name: Simple Events
 Plugin URI: http://wordpress.org/extend/plugins/simple-events/
 Description: If a custom post type called "event" or "*_event" is registered, this plugin steps in and does the rest for simple event functionality.
 Author: Steve Taylor
-Version: 0.1.5
+Version: 0.1.6
 Author URI: http://sltaylor.co.uk
 License: GPLv2
 */
@@ -17,18 +17,18 @@ License: GPLv2
 /* Inspired by code in Professional WordPress Development by Brad Williams, Ozh Richard and Justin Tadlock */
 
 /*
-This program is free software; you can redistribute it and/or modify 
-it under the terms of the GNU General Public License as published by 
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
 the Free Software Foundation; version 2 of the License.
 
-This program is distributed in the hope that it will be useful, 
-but WITHOUT ANY WARRANTY; without even the implied warranty of 
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
-GNU General Public License for more details. 
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License 
-along with this program; if not, write to the Free Software 
-Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA 
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 // Make sure we don't expose any info if called directly
@@ -37,8 +37,8 @@ if ( ! function_exists( 'add_action' ) ) {
 	exit;
 }
 
-// Initialize
-add_action( 'init', 'slt_se_init' );
+// Initialize - low priority so that post types are already registered before this runs
+add_action( 'init', 'slt_se_init', 100000 );
 function slt_se_init() {
 	define( 'SLT_SE_EVENT_DATE_FIELD', 'event_date' );
 	$slt_se_event_post_type = '';
@@ -75,8 +75,8 @@ function slt_se_init() {
 					'capabilities'			=> array( 'edit_pages' )
 				)
 			)
-		));		
-		
+		));
+
 		// Hooks
 		if ( ! is_admin() || ( defined( 'DOING_AJAX' ) && DOING_AJAX ) ) {
 			/*  By default, front-end event queries should return future events only, based on the
@@ -94,9 +94,9 @@ function slt_se_init() {
 			add_action( "manage_posts_custom_column", "slt_se_columns_display" );
 			// Sortable not working - see http://scribu.net/wordpress/custom-sortable-columns.html
 			//add_filter( 'manage_edit-{$slt_se_event_post_type}_sortable_columns', 'slt_se_columns_sortable' );
-			//add_filter( 'request', 'slt_se_columns_orderby' );		
+			//add_filter( 'request', 'slt_se_columns_orderby' );
 		}
-	
+
 	}
 }
 

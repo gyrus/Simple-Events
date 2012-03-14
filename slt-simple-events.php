@@ -41,21 +41,17 @@ if ( ! function_exists( 'add_action' ) ) {
 add_action( 'init', 'slt_se_init', 100000 );
 function slt_se_init() {
 	define( 'SLT_SE_EVENT_DATE_FIELD', 'event_date' );
-	$slt_se_event_post_type = '';
+	global $slt_se_event_post_types;
+	$slt_se_event_post_types = array();
 	if ( post_type_exists( 'event' ) ) {
-		$slt_se_event_post_type = 'event';
-	} else {
-		foreach ( get_post_types( array( 'public' => true, '_builtin' => false ) ) as $cpt ) {
-			if ( preg_match( '#[^_]+_event#', $cpt ) ) {
-				$slt_se_event_post_type = $cpt;
-				break;
-			}
-		}
+		$slt_se_event_post_types[] = 'event';
+	foreach ( get_post_types( array( 'public' => true, '_builtin' => false ) ) as $cpt ) {
+		if ( preg_match( '#[^_]+_event#', $cpt ) )
+			$slt_se_event_post_types[] = $cpt;
 	}
-	define( 'SLT_SE_EVENT_POST_TYPE', $slt_se_event_post_type );
 
 	// Check dependencies
-	if ( function_exists( 'slt_cf_register_box' ) && SLT_SE_EVENT_POST_TYPE ) {
+	if ( function_exists( 'slt_cf_register_box' ) && count( $slt_se_event_post_types ) ) {
 
 		// Event date custom field
 		slt_cf_register_box( array(
@@ -71,7 +67,7 @@ function slt_se_init() {
 					'hide_label'			=> true,
 					'type'					=> 'date',
 					'datepicker_format'		=> 'yy/mm/dd',
-					'scope'					=> array( SLT_SE_EVENT_POST_TYPE ),
+					'scope'					=> $slt_se_event_post_types,
 					'capabilities'			=> array( 'edit_pages' )
 				)
 			)
@@ -90,7 +86,8 @@ function slt_se_init() {
 				add_filter( 'posts_join', 'slt_se_join_sql', 10, 2 );
 		} else if ( is_admin() ) {
 			// Admin stuff
-			add_filter( "manage_edit-{$slt_se_event_post_type}_columns", "slt_se_columns" );
+			foreach ( $slt_se_event_post_types as $slt_se_event_post_type )
+				add_filter( "manage_edit-{$slt_se_event_post_type}_columns", "slt_se_columns" );
 			add_action( "manage_posts_custom_column", "slt_se_columns_display" );
 			// Sortable not working - see http://scribu.net/wordpress/custom-sortable-columns.html
 			//add_filter( 'manage_edit-{$slt_se_event_post_type}_sortable_columns', 'slt_se_columns_sortable' );
@@ -111,11 +108,12 @@ function slt_se_register_query_vars( $vars ) {
 
 // Test for whether a hook should be applied or not
 function slt_se_apply_hook( $query, $hook ) {
+	global $slt_se_event_post_types;
 	return (
 		// We have query vars
 		property_exists( $query, 'query_vars' ) &&
 		// The query is for events
-		( array_key_exists( 'post_type', $query->query_vars ) && $query->query_vars['post_type'] == SLT_SE_EVENT_POST_TYPE ) &&
+		( array_key_exists( 'post_type', $query->query_vars ) && in_array( $query->query_vars['post_type'], $slt_se_event_post_types ) ) &&
 		// It's not a single view
 		! $query->is_singular &&
 		// disable_simple_events isn't set, or is set to false
@@ -190,12 +188,13 @@ function slt_event_columns_orderby( $vars ) {
 // Function to return event date if it's an event post, WP post date otherwise
 // Returned as PHP timestamp
 function slt_se_get_date( $the_post = null ) {
+	global $slt_se_event_post_types;
 	if ( ! is_object( $the_post ) ) {
 		global $post;
 		$the_post = $post;
 	}
 	$date = null;
-	if ( get_post_type( $the_post ) == SLT_SE_EVENT_POST_TYPE && function_exists( 'slt_cf_field_value' ) ) {
+	if ( in_array( get_post_type( $the_post ), $slt_se_event_post_types ) && function_exists( 'slt_cf_field_value' ) ) {
 		$date_value = slt_cf_field_value( SLT_SE_EVENT_DATE_FIELD, 'post', $the_post->ID );
 		if ( $date_value ) {
 			$date_parts = explode( "/", $date_value );

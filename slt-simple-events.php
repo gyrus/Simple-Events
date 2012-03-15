@@ -43,7 +43,7 @@ function slt_se_init() {
 	define( 'SLT_SE_EVENT_DATE_FIELD', 'event_date' );
 	global $slt_se_event_post_types;
 	$slt_se_event_post_types = array();
-	if ( post_type_exists( 'event' ) ) {
+	if ( post_type_exists( 'event' ) )
 		$slt_se_event_post_types[] = 'event';
 	foreach ( get_post_types( array( 'public' => true, '_builtin' => false ) ) as $cpt ) {
 		if ( preg_match( '#[^_]+_event#', $cpt ) )

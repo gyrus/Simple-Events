@@ -199,7 +199,7 @@ function slt_se_get_date( $the_post = null ) {
 		$date_value = slt_cf_field_value( SLT_SE_EVENT_DATE_FIELD, 'post', $the_post->ID );
 		if ( $date_value ) {
 			$date_parts = explode( "/", $date_value );
-			if ( count( $date_parts == 3 ) && checkdate( $date_parts[1], $date_parts[2], $date_parts[0] ) )
+			if ( count( $date_parts ) == 3 && checkdate( $date_parts[1], $date_parts[2], $date_parts[0] ) )
 				$date = mktime( 0, 0, 0, $date_parts[1], $date_parts[2], $date_parts[0] );
 		}
 	}

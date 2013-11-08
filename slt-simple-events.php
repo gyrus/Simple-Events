@@ -9,7 +9,7 @@ Plugin Name: Simple Events
 Plugin URI: http://wordpress.org/extend/plugins/simple-events/
 Description: If a custom post type called "event" or "*_event" is registered, this plugin steps in and does the rest for simple event functionality.
 Author: Steve Taylor
-Version: 0.1.6
+Version: 0.1.7
 Author URI: http://sltaylor.co.uk
 License: GPLv2
 */
@@ -131,7 +131,7 @@ function slt_se_parse_query( $query ) {
 		$order = ( isset( $query->query_vars['slt_reverse_events'] ) && $query->query_vars['slt_reverse_events'] ) ? 'DESC' : 'ASC';
 		$query->query_vars['orderby']	= 'meta_value';
 		$query->query_vars['order']		= $order;
-		$query->query_vars['meta_key']	= slt_cf_field_key( SLT_SE_EVENT_DATE_FIELD );
+		$query->query_vars['meta_key']	= function_exists( 'slt_cf_field_key' ) ? slt_cf_field_key( SLT_SE_EVENT_DATE_FIELD ) : SLT_SE_EVENT_DATE_FIELD;
 	}
 }
 
@@ -152,7 +152,7 @@ function slt_se_where_sql( $where, $query ) {
 		if ( version_compare( get_bloginfo( 'version' ), '3.1.1', '<' ) ) {
 			// Not necessary since 3.1.1
 	 		$where .= " AND $wpdb->posts.ID = $wpdb->postmeta.post_id ";
- 			$where .= " AND $wpdb->postmeta.meta_key = '" . slt_cf_field_key( SLT_SE_EVENT_DATE_FIELD ) . "' ";
+ 			$where .= " AND $wpdb->postmeta.meta_key = '" . ( function_exists( 'slt_cf_field_key' ) ? slt_cf_field_key( SLT_SE_EVENT_DATE_FIELD ) : SLT_SE_EVENT_DATE_FIELD ) . "' ";
 		}
 		$today = date( 'Y-m-d H:i:s', time() );
  		$where .= " AND STR_TO_DATE( $wpdb->postmeta.meta_value, '%Y/%m/%d' ) $comparison_operator '$today' ";
@@ -166,7 +166,7 @@ function slt_se_columns( $columns ) {
 	return $columns;
 }
 function slt_se_columns_display( $column ) {
-	if ( $column == SLT_SE_EVENT_DATE_FIELD )
+	if ( $column == SLT_SE_EVENT_DATE_FIELD && function_exists( 'slt_cf_field_value' ) )
 		echo slt_cf_field_value( SLT_SE_EVENT_DATE_FIELD );
 }
 

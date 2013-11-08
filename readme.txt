@@ -38,6 +38,7 @@ Development code hosted at [GitHub](https://github.com/gyrus/Simple-Events).
 == Changelog ==
 = 0.1.7 =
 * Fixed bug in `slt_se_get_date()` testing of `$date_parts` length
+* More tests for Developer's Custom Fields functions
 
 = 0.1.6 =
 * Set the priority of the init action very low so that any custom post types are definitely registered first (thanks lowe_22!)

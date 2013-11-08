@@ -13,6 +13,7 @@ If the plugin detects that there is a custom post type registered with a particu
 
 * For front-end queries fetching events, returned posts are sorted chronologically, the oldest first.
 * For front-end queries fetching events, by default only future events are returned. This can be overridden by setting the custom parameter `slt_all_events` in your posts query to `true`. Alternatively, use `slt_past_events` (set to `true`) to get only past events.
+* By default the current time is used to compare dates for selecting past or future events. To change the time used for the cut-off, use the filter `slt_se_listing_time_offset`. It defaults to `0` (no change from the current time). To set the cut-off to 24 hours ahead of the current time, hook a function to this filter that returns that value in seconds, i.e. `60 * 60 * 24`.
 * By default events are ordered chronologically. To reverse the order, set `slt_reverse_events` to `true`.
 * In the admin listing page for events, an 'Event date' column is added.
 * For particular queries, all actions performed by this plugin can be disabled by setting the custom parameter `disable_simple_events` in your posts query to `true`.
@@ -36,7 +37,8 @@ Development code hosted at [GitHub](https://github.com/gyrus/Simple-Events).
 1. Activate the plugin through the 'Plugins' menu in WordPress
 
 == Changelog ==
-= 0.1.7 =
+= 0.2 =
+* Added `slt_se_listing_time_offset` filter
 * Fixed bug in `slt_se_get_date()` testing of `$date_parts` length
 * More tests for Developer's Custom Fields functions
 

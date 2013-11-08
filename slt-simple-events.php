@@ -9,7 +9,7 @@ Plugin Name: Simple Events
 Plugin URI: http://wordpress.org/extend/plugins/simple-events/
 Description: If a custom post type called "event" or "*_event" is registered, this plugin steps in and does the rest for simple event functionality.
 Author: Steve Taylor
-Version: 0.1.7
+Version: 0.2
 Author URI: http://sltaylor.co.uk
 License: GPLv2
 */
@@ -154,7 +154,7 @@ function slt_se_where_sql( $where, $query ) {
 	 		$where .= " AND $wpdb->posts.ID = $wpdb->postmeta.post_id ";
  			$where .= " AND $wpdb->postmeta.meta_key = '" . ( function_exists( 'slt_cf_field_key' ) ? slt_cf_field_key( SLT_SE_EVENT_DATE_FIELD ) : SLT_SE_EVENT_DATE_FIELD ) . "' ";
 		}
-		$today = date( 'Y-m-d H:i:s', time() );
+		$today = date( 'Y-m-d H:i:s', time() + apply_filters( 'slt_se_listing_time_offset', 0 ) );
  		$where .= " AND STR_TO_DATE( $wpdb->postmeta.meta_value, '%Y/%m/%d' ) $comparison_operator '$today' ";
 	}
 	return $where;

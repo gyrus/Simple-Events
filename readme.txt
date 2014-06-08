@@ -3,7 +3,7 @@ Contributors: gyrus
 Donate link: http://www.babyloniantimes.co.uk/index.php?page=donate
 Tags: events, custom post types
 Requires at least: 3.0
-Tested up to: 3.7.1
+Tested up to: 3.9.1
 Stable tag: 0.2
 
 Provides theme developers with simple extensions to sites with events as a custom post type.
@@ -37,6 +37,9 @@ Development code hosted at [GitHub](https://github.com/gyrus/Simple-Events).
 1. Activate the plugin through the 'Plugins' menu in WordPress
 
 == Changelog ==
+= 0.2.1 =
+* Made plugin translation-ready
+
 = 0.2 =
 * Added `slt_se_listing_time_offset` filter
 * Fixed bug in `slt_se_get_date()` testing of `$date_parts` length

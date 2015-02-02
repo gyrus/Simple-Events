@@ -9,7 +9,7 @@ Plugin Name: Simple Events
 Plugin URI: http://wordpress.org/extend/plugins/simple-events/
 Description: If a custom post type called "event" or "*_event" is registered, this plugin steps in and does the rest for simple event functionality.
 Author: Steve Taylor
-Version: 0.2
+Version: 0.3
 Author URI: http://sltaylor.co.uk
 License: GPLv2
 */
@@ -31,7 +31,7 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 global $slt_se_plugin_slug;
-$slt_se_plugin_slug= 'slt-simple-events';
+$slt_se_plugin_slug = 'slt-simple-events';
 
 // Make sure we don't expose any info if called directly
 if ( ! function_exists( 'add_action' ) ) {
@@ -45,6 +45,7 @@ function slt_se_init() {
 	global $slt_se_plugin_slug;
 
 	define( 'SLT_SE_EVENT_DATE_FIELD', 'event_date' );
+	define( 'SLT_SE_EVENT_END_DATE_FIELD', 'event_end_date' );
 	$slt_se_event_post_type = '';
 	if ( post_type_exists( 'event' ) ) {
 		$slt_se_event_post_type = 'event';
@@ -69,20 +70,31 @@ function slt_se_init() {
 		// Event date custom field
 		slt_cf_register_box( array(
 			'type'		=> 'post',
-			'title'		=> __( 'Event date', $slt_se_plugin_slug ),
+			'title'		=> __( 'Event dates', $slt_se_plugin_slug ),
 			'id'		=> 'event_date_box',
 			'context'	=> 'side',
 			'priority'	=> 'high',
 			'fields'	=> array(
 				array(
 					'name'					=> SLT_SE_EVENT_DATE_FIELD,
-					'label'					=> __( 'Date', $slt_se_plugin_slug ),
-					'hide_label'			=> true,
-					'type'					=> 'date',
+					'label'					=> __( 'Start date / time', $slt_se_plugin_slug ),
+					'type'					=> 'datetime',
 					'datepicker_format'		=> 'yy/mm/dd',
+					'timepicker_format'		=> 'hh:mm',
+					'timepicker_am_pm'		=> false,
 					'scope'					=> array( SLT_SE_EVENT_POST_TYPE ),
 					'capabilities'			=> array( 'edit_pages' )
-				)
+				),
+				array(
+					'name'					=> SLT_SE_EVENT_END_DATE_FIELD,
+					'label'					=> __( 'End date / time', $slt_se_plugin_slug ),
+					'type'					=> 'datetime',
+					'datepicker_format'		=> 'yy/mm/dd',
+					'timepicker_format'		=> 'hh:mm',
+					'timepicker_am_pm'		=> false,
+					'scope'					=> array( SLT_SE_EVENT_POST_TYPE ),
+					'capabilities'			=> array( 'edit_pages' )
+				),
 			)
 		));
 
@@ -225,9 +237,14 @@ function slt_se_get_date( $the_post = null ) {
 	if ( get_post_type( $the_post ) == SLT_SE_EVENT_POST_TYPE && function_exists( 'slt_cf_field_value' ) ) {
 		$date_value = slt_cf_field_value( SLT_SE_EVENT_DATE_FIELD, 'post', $the_post->ID );
 		if ( $date_value ) {
-			$date_parts = explode( "/", $date_value );
+			$date_time_parts = explode( ' ', $date_value );
+			$date_parts = explode( '/', $date_time_parts[0] );
+			$time_parts = array( 0, 0 );
+			if ( count( $date_time_parts ) == 2 ) {
+				$time_parts = explode( ':', $date_time_parts[1] );
+			}
 			if ( count( $date_parts ) == 3 && checkdate( $date_parts[1], $date_parts[2], $date_parts[0] ) ) {
-				$date = mktime( 0, 0, 0, $date_parts[1], $date_parts[2], $date_parts[0] );
+				$date = mktime( $time_parts[0], $time_parts[1], 0, $date_parts[1], $date_parts[2], $date_parts[0] );
 			}
 		}
 	}

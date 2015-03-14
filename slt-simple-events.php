@@ -226,7 +226,7 @@ function slt_event_columns_orderby( $vars ) {
 
 // Function to return event date if it's an event post, WP post date otherwise
 // Returned as PHP timestamp
-function slt_se_get_date( $the_post = null ) {
+function slt_se_get_date( $the_post = null, $which_date = 'start' ) {
 
 	if ( ! is_object( $the_post ) ) {
 		global $post;
@@ -235,7 +235,11 @@ function slt_se_get_date( $the_post = null ) {
 	$date = null;
 
 	if ( get_post_type( $the_post ) == SLT_SE_EVENT_POST_TYPE && function_exists( 'slt_cf_field_value' ) ) {
-		$date_value = slt_cf_field_value( SLT_SE_EVENT_DATE_FIELD, 'post', $the_post->ID );
+		$date_field = SLT_SE_EVENT_DATE_FIELD;
+		if ( $which_date == 'end' ) {
+			$date_field = SLT_SE_EVENT_END_DATE_FIELD;
+		}
+		$date_value = slt_cf_field_value( $date_field, 'post', $the_post->ID );
 		if ( $date_value ) {
 			$date_time_parts = explode( ' ', $date_value );
 			$date_parts = explode( '/', $date_time_parts[0] );

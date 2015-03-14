@@ -22,9 +22,10 @@ If the plugin detects that there is a custom post type registered with a particu
 
 In addition, this function is provided for convenience. If an event date exists for the post in question, it returns that; if not, it returns the standard post date.
 
-`<?php slt_se_get_date( $the_post = null ) ?>`
+`<?php slt_se_get_date( $the_post = null, $date = 'start' ) ?>`
 
 * **$the_post** (object) (optional) (default: global $post object)
+* **$which_date** (string) (optional) (default: 'start') Pass 'end' to get end date
 
 **NOTE:** An Event Date custom field will be added to the event edit screen automatically if [my Custom Fields plugin](http://sltaylor.co.uk/wordpress/plugins/slt-custom-fields/) is active. Otherwise, make sure your event post type supports `custom-fields` (see `[register_post_type](http://codex.wordpress.org/Function_Reference/register_post_type)`, and add dates to events with the format YYYY/MM/DD, e.g. 2011/12/21 - this format is required to allow sorting by this field.
 
@@ -39,6 +40,7 @@ Development code hosted at [GitHub](https://github.com/gyrus/Simple-Events).
 == Changelog ==
 = 0.3 =
 * Added start/end date, plus times
+* Changed slt_se_get_date to also handle end date
 * Made plugin translation-ready
 
 = 0.2 =

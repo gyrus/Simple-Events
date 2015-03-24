@@ -224,8 +224,15 @@ function slt_event_columns_orderby( $vars ) {
 }
 */
 
-// Function to return event date if it's an event post, WP post date otherwise
-// Returned as PHP timestamp
+
+/**
+ * Return event date if it's an event post, WP post date otherwise
+ *
+ * @since	0.1
+ * @param	object		$the_post
+ * @param	string		$which_date		'start' | 'end'
+ * @return	string						Timestamp
+ */
 function slt_se_get_date( $the_post = null, $which_date = 'start' ) {
 
 	if ( ! is_object( $the_post ) ) {
@@ -241,15 +248,7 @@ function slt_se_get_date( $the_post = null, $which_date = 'start' ) {
 		}
 		$date_value = slt_cf_field_value( $date_field, 'post', $the_post->ID );
 		if ( $date_value ) {
-			$date_time_parts = explode( ' ', $date_value );
-			$date_parts = explode( '/', $date_time_parts[0] );
-			$time_parts = array( 0, 0 );
-			if ( count( $date_time_parts ) == 2 ) {
-				$time_parts = explode( ':', $date_time_parts[1] );
-			}
-			if ( count( $date_parts ) == 3 && checkdate( $date_parts[1], $date_parts[2], $date_parts[0] ) ) {
-				$date = mktime( $time_parts[0], $time_parts[1], 0, $date_parts[1], $date_parts[2], $date_parts[0] );
-			}
+			$date = slt_se_date_to_timestamp( $date_value );
 		}
 	}
 
@@ -258,4 +257,26 @@ function slt_se_get_date( $the_post = null, $which_date = 'start' ) {
 	}
 
 	return $date;
+}
+
+
+/**
+ * Convert stored date value to timestamp
+ *
+ * @since	0.3
+ * @param	string	$date_value
+ * @return	string					Timestamp
+ */
+function slt_se_date_to_timestamp( $date_value ) {
+	$ts = null;
+	$date_time_parts = explode( ' ', $date_value );
+	$date_parts = explode( '/', $date_time_parts[0] );
+	$time_parts = array( 0, 0 );
+	if ( count( $date_time_parts ) == 2 ) {
+		$time_parts = explode( ':', $date_time_parts[1] );
+	}
+	if ( count( $date_parts ) == 3 && checkdate( $date_parts[1], $date_parts[2], $date_parts[0] ) ) {
+		$ts = mktime( $time_parts[0], $time_parts[1], 0, $date_parts[1], $date_parts[2], $date_parts[0] );
+	}
+	return $ts;
 }

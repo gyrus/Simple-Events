@@ -40,7 +40,8 @@ Development code hosted at [GitHub](https://github.com/gyrus/Simple-Events).
 == Changelog ==
 = 0.3 =
 * Added start/end date, plus times
-* Changed slt_se_get_date to also handle end date
+* Changed `slt_se_get_date` to also handle end date
+* Added `slt_se_date_to_timestamp()`
 * Made plugin translation-ready
 
 = 0.2 =

@@ -58,6 +58,9 @@ function slt_se_init() {
 		}
 	}
 	define( 'SLT_SE_EVENT_POST_TYPE', $slt_se_event_post_type );
+	if ( ! defined( 'SLT_SE_EVENT_DATE_QUERY_VAR_FORMAT' ) ) {
+		define( 'SLT_SE_EVENT_DATE_QUERY_VAR_FORMAT', null );
+	}
 
 	// Internationalization
 	$locale = apply_filters( 'plugin_locale', get_locale(), $slt_se_plugin_slug );
@@ -79,6 +82,7 @@ function slt_se_init() {
 					'name'					=> SLT_SE_EVENT_DATE_FIELD,
 					'label'					=> __( 'Start date / time', $slt_se_plugin_slug ),
 					'type'					=> 'datetime',
+					'make_query_var'		=> (bool) SLT_SE_EVENT_DATE_QUERY_VAR_FORMAT,
 					'datepicker_format'		=> 'yy/mm/dd',
 					'timepicker_format'		=> 'hh:mm',
 					'timepicker_am_pm'		=> false,

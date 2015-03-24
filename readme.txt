@@ -17,6 +17,7 @@ If the plugin detects that there is a custom post type registered with a particu
 * By default events are ordered chronologically. To reverse the order, set `slt_reverse_events` to `true`.
 * In the admin listing page for events, an 'Event date' column is added.
 * For particular queries, all actions performed by this plugin can be disabled by setting the custom parameter `disable_simple_events` in your posts query to `true`.
+* If the event (start) date is being used for filtering and you want to use the automatic query var filtering provided in the Developer's Custom Fields plugin, set the constant `SLT_SE_EVENT_DATE_QUERY_VAR_FORMAT` in your theme to the format that's being passed. Currently accepted values: `Y`, `mY`
 
 **IMPORTANT:** The automatic event filtering only kicks in with front-end queries done using `WP_Query`. Use this rather than `get_posts`.
 
@@ -42,6 +43,7 @@ Development code hosted at [GitHub](https://github.com/gyrus/Simple-Events).
 * Added start/end date, plus times
 * Changed `slt_se_get_date` to also handle end date
 * Added `slt_se_date_to_timestamp()`
+* Added `SLT_SE_EVENT_DATE_QUERY_VAR_FORMAT`
 * Made plugin translation-ready
 
 = 0.2 =

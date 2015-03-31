@@ -12,7 +12,7 @@ Provides theme developers with simple extensions to sites with events as a custo
 If the plugin detects that there is a custom post type registered with a particular name (either 'event' or '*_event'), it steps in and does a number of useful additional things:
 
 * For front-end queries fetching events, returned posts are sorted chronologically, the oldest first.
-* For front-end queries fetching events, by default only future events are returned. This can be overridden by setting the custom parameter `slt_all_events` in your posts query to `true`. Alternatively, use `slt_past_events` (set to `true`) to get only past events.
+* For front-end queries fetching events, by default only future events are returned. This can be overridden by setting the custom parameter `slt_all_events` in your posts query to `true`. Alternatively, use `slt_past_events` (set to `true`) to get only past events. Also, because end dates were added recently, the start date is the default cut-off for 'future' events. In order to use end dates as the cut-off, set the constant `SLT_SE_END_DATE_IS_FUTURE_CUT_OFF` in your theme to `true`.
 * By default the current time is used to compare dates for selecting past or future events. To change the time used for the cut-off, use the filter `slt_se_listing_time_offset`. It defaults to `0` (no change from the current time). To set the cut-off to 24 hours ahead of the current time, hook a function to this filter that returns that value in seconds, i.e. `60 * 60 * 24`.
 * By default events are ordered chronologically. To reverse the order, set `slt_reverse_events` to `true`.
 * In the admin listing page for events, an 'Event date' column is added.
@@ -41,6 +41,7 @@ Development code hosted at [GitHub](https://github.com/gyrus/Simple-Events).
 == Changelog ==
 = 0.3 =
 * Added start/end date, plus times
+* Added `SLT_SE_END_DATE_IS_FUTURE_CUT_OFF`
 * Changed `slt_se_get_date` to also handle end date
 * Added `slt_se_date_to_timestamp()`
 * Added `SLT_SE_EVENT_DATE_QUERY_VAR_FORMAT`

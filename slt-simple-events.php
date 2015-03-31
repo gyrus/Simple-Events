@@ -61,6 +61,9 @@ function slt_se_init() {
 	if ( ! defined( 'SLT_SE_EVENT_DATE_QUERY_VAR_FORMAT' ) ) {
 		define( 'SLT_SE_EVENT_DATE_QUERY_VAR_FORMAT', null );
 	}
+	if ( ! defined( 'SLT_SE_END_DATE_IS_FUTURE_CUT_OFF' ) ) {
+		define( 'SLT_SE_END_DATE_IS_FUTURE_CUT_OFF', false );
+	}
 
 	// Internationalization
 	$locale = apply_filters( 'plugin_locale', get_locale(), $slt_se_plugin_slug );
@@ -161,7 +164,8 @@ function slt_se_parse_query( $query ) {
 		$order = ( isset( $query->query_vars['slt_reverse_events'] ) && $query->query_vars['slt_reverse_events'] ) ? 'DESC' : 'ASC';
 		$query->query_vars['orderby']	= 'meta_value';
 		$query->query_vars['order']		= $order;
-		$query->query_vars['meta_key']	= function_exists( 'slt_cf_field_key' ) ? slt_cf_field_key( SLT_SE_EVENT_DATE_FIELD ) : SLT_SE_EVENT_DATE_FIELD;
+		$future_cut_off_field			= SLT_SE_END_DATE_IS_FUTURE_CUT_OFF ? SLT_SE_EVENT_END_DATE_FIELD : SLT_SE_EVENT_DATE_FIELD;
+		$query->query_vars['meta_key']	= function_exists( 'slt_cf_field_key' ) ? slt_cf_field_key( $future_cut_off_field ) : $future_cut_off_field;
 	}
 }
 
@@ -182,11 +186,12 @@ function slt_se_where_sql( $where, $query ) {
 	if ( slt_se_apply_hook( $query, 'where' ) ) {
 		global $wpdb;
 		$comparison_operator = ( isset( $query->query_vars['slt_past_events'] ) && $query->query_vars['slt_past_events'] ) ? '<' : '>=';
+		$future_cut_off_field = SLT_SE_END_DATE_IS_FUTURE_CUT_OFF ? SLT_SE_EVENT_END_DATE_FIELD : SLT_SE_EVENT_DATE_FIELD;
 
 		if ( version_compare( get_bloginfo( 'version' ), '3.1.1', '<' ) ) {
 			// Not necessary since 3.1.1
 	 		$where .= " AND $wpdb->posts.ID = $wpdb->postmeta.post_id ";
- 			$where .= " AND $wpdb->postmeta.meta_key = '" . ( function_exists( 'slt_cf_field_key' ) ? slt_cf_field_key( SLT_SE_EVENT_DATE_FIELD ) : SLT_SE_EVENT_DATE_FIELD ) . "' ";
+ 			$where .= " AND $wpdb->postmeta.meta_key = '" . ( function_exists( 'slt_cf_field_key' ) ? slt_cf_field_key( $future_cut_off_field ) : $future_cut_off_field ) . "' ";
 		}
 
 		$today = date( 'Y-m-d H:i:s', time() + apply_filters( 'slt_se_listing_time_offset', 0 ) );

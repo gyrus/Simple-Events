@@ -161,11 +161,31 @@ function slt_se_apply_hook( $query, $hook ) {
 // Parse query
 function slt_se_parse_query( $query ) {
 	if ( slt_se_apply_hook( $query, 'parse' ) ) {
-		$order = ( isset( $query->query_vars['slt_reverse_events'] ) && $query->query_vars['slt_reverse_events'] ) ? 'DESC' : 'ASC';
-		$query->query_vars['orderby']	= 'meta_value';
-		$query->query_vars['order']		= $order;
+
+		// This sets the meta key for cut-off date comparison
 		$future_cut_off_field			= SLT_SE_END_DATE_IS_FUTURE_CUT_OFF ? SLT_SE_EVENT_END_DATE_FIELD : SLT_SE_EVENT_DATE_FIELD;
 		$query->query_vars['meta_key']	= function_exists( 'slt_cf_field_key' ) ? slt_cf_field_key( $future_cut_off_field ) : $future_cut_off_field;
+
+		// Determine forward or reverse chronological order
+		$order = ( isset( $query->query_vars['slt_reverse_events'] ) && $query->query_vars['slt_reverse_events'] ) ? 'DESC' : 'ASC';
+		$query->query_vars['order']		= $order;
+
+		if ( version_compare( get_bloginfo( 'version' ), '4.2', '<' ) ) {
+
+			// Below 4.2, we have to order by the same field used for the cut-off
+			$query->query_vars['orderby']	= 'meta_value';
+
+		} else {
+
+			// 4.2+, we always order by start date, which may not be the cut-off field
+			$query->query_vars['meta_query']['event_start_date_clause'] = array(
+				'key'		=> function_exists( 'slt_cf_field_key' ) ? slt_cf_field_key( SLT_SE_EVENT_DATE_FIELD ) : SLT_SE_EVENT_DATE_FIELD,
+				'compare'	=> 'EXISTS',
+			);
+			$query->query_vars['orderby']	= 'event_start_date_clause';
+
+		}
+
 	}
 }
 

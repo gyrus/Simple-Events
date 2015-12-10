@@ -48,6 +48,7 @@ Development code hosted at [GitHub](https://github.com/gyrus/Simple-Events).
 * Added `slt_se_date_to_timestamp()`
 * Added `SLT_SE_EVENT_DATE_QUERY_VAR_FORMAT`
 * Made plugin translation-ready
+* Made plugin compatible with CMB2
 
 = 0.2 =
 * Added `slt_se_listing_time_offset` filter

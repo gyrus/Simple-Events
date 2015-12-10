@@ -44,8 +44,6 @@ add_action( 'init', 'slt_se_init', 100000 );
 function slt_se_init() {
 	global $slt_se_plugin_slug;
 
-	define( 'SLT_SE_EVENT_DATE_FIELD', 'event_date' );
-	define( 'SLT_SE_EVENT_END_DATE_FIELD', 'event_end_date' );
 	$slt_se_event_post_type = '';
 	if ( post_type_exists( 'event' ) ) {
 		$slt_se_event_post_type = 'event';
@@ -64,6 +62,17 @@ function slt_se_init() {
 	if ( ! defined( 'SLT_SE_END_DATE_IS_FUTURE_CUT_OFF' ) ) {
 		define( 'SLT_SE_END_DATE_IS_FUTURE_CUT_OFF', false );
 	}
+	define( 'SLT_SE_PLUGIN_EXISTS_DCF', function_exists( 'slt_cf_register_box' ) );
+	define( 'SLT_SE_PLUGIN_EXISTS_CMB2', defined( 'CMB2_LOADED' ) && CMB2_LOADED );
+	$event_date_field = 'event_date';
+	$event_end_date_field = 'event_end_date';
+	// DCF adds a prefix - need to add one here for CMB2
+	if ( SLT_SE_PLUGIN_EXISTS_CMB2 ) {
+		$event_date_field = '_' . $event_date_field;
+		$event_end_date_field = '_' . $event_end_date_field;
+	}
+	define( 'SLT_SE_EVENT_DATE_FIELD', $event_date_field );
+	define( 'SLT_SE_EVENT_END_DATE_FIELD', $event_end_date_field );
 
 	// Internationalization
 	$locale = apply_filters( 'plugin_locale', get_locale(), $slt_se_plugin_slug );
@@ -71,39 +80,67 @@ function slt_se_init() {
 	load_plugin_textdomain( $slt_se_plugin_slug, FALSE, basename( dirname( __FILE__ ) ) . '/languages' );
 
 	// Check dependencies
-	if ( function_exists( 'slt_cf_register_box' ) && SLT_SE_EVENT_POST_TYPE ) {
+	if ( SLT_SE_EVENT_POST_TYPE ) {
 
-		// Event date custom field
-		slt_cf_register_box( array(
-			'type'		=> 'post',
-			'title'		=> __( 'Event dates', $slt_se_plugin_slug ),
-			'id'		=> 'event_date_box',
-			'context'	=> 'side',
-			'priority'	=> 'high',
-			'fields'	=> array(
-				array(
-					'name'					=> SLT_SE_EVENT_DATE_FIELD,
-					'label'					=> __( 'Start date / time', $slt_se_plugin_slug ),
-					'type'					=> 'datetime',
-					'make_query_var'		=> (bool) SLT_SE_EVENT_DATE_QUERY_VAR_FORMAT,
-					'datepicker_format'		=> 'yy/mm/dd',
-					'timepicker_format'		=> 'hh:mm',
-					'timepicker_am_pm'		=> false,
-					'scope'					=> array( SLT_SE_EVENT_POST_TYPE ),
-					'capabilities'			=> array( 'edit_pages' )
-				),
-				array(
-					'name'					=> SLT_SE_EVENT_END_DATE_FIELD,
-					'label'					=> __( 'End date / time', $slt_se_plugin_slug ),
-					'type'					=> 'datetime',
-					'datepicker_format'		=> 'yy/mm/dd',
-					'timepicker_format'		=> 'hh:mm',
-					'timepicker_am_pm'		=> false,
-					'scope'					=> array( SLT_SE_EVENT_POST_TYPE ),
-					'capabilities'			=> array( 'edit_pages' )
-				),
-			)
-		));
+		if ( SLT_SE_PLUGIN_EXISTS_DCF ) {
+
+			// Developer's Custom Fields
+			slt_cf_register_box( array(
+				'type'		=> 'post',
+				'title'		=> __( 'Event dates', $slt_se_plugin_slug ),
+				'id'		=> 'event_date_box',
+				'context'	=> 'side',
+				'priority'	=> 'high',
+				'fields'	=> array(
+					array(
+						'name'					=> SLT_SE_EVENT_DATE_FIELD,
+						'label'					=> __( 'Start date / time', $slt_se_plugin_slug ),
+						'type'					=> 'datetime',
+						'make_query_var'		=> (bool) SLT_SE_EVENT_DATE_QUERY_VAR_FORMAT,
+						'datepicker_format'		=> 'yy/mm/dd',
+						'timepicker_format'		=> 'hh:mm',
+						'timepicker_am_pm'		=> false,
+						'scope'					=> array( SLT_SE_EVENT_POST_TYPE ),
+						'capabilities'			=> array( 'edit_pages' )
+					),
+					array(
+						'name'					=> SLT_SE_EVENT_END_DATE_FIELD,
+						'label'					=> __( 'End date / time', $slt_se_plugin_slug ),
+						'type'					=> 'datetime',
+						'datepicker_format'		=> 'yy/mm/dd',
+						'timepicker_format'		=> 'hh:mm',
+						'timepicker_am_pm'		=> false,
+						'scope'					=> array( SLT_SE_EVENT_POST_TYPE ),
+						'capabilities'			=> array( 'edit_pages' )
+					),
+				)
+			));
+
+		} else if ( SLT_SE_PLUGIN_EXISTS_CMB2 ) {
+
+			// CMB2
+			$cmb = new_cmb2_box( array(
+				'id'				=> 'event_date_box',
+				'title'				=> __( 'Event dates', $slt_se_plugin_slug ),
+				'object_types'		=> array( SLT_SE_EVENT_POST_TYPE ),
+				'context'			=> 'side',
+				'priority'			=> 'high',
+				'show_names'		=> true,
+			));
+			$cmb->add_field( array(
+				'name'				=> __( 'Start date / time' ),
+				'id'				=> SLT_SE_EVENT_DATE_FIELD,
+				'type'				=> 'text_datetime_timestamp',
+				'on_front'			=> false,
+			) );
+			$cmb->add_field( array(
+				'name'				=> __( 'End date / time' ),
+				'id'				=> SLT_SE_EVENT_END_DATE_FIELD,
+				'type'				=> 'text_datetime_timestamp',
+				'on_front'			=> false,
+			) );
+
+		}
 
 		// Hooks
 		if ( ! is_admin() || ( defined( 'DOING_AJAX' ) && DOING_AJAX ) ) {
